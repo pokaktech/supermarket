@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from .serializers import UserSerializer,ProductSerializer,CategorySerializer, ReviewSerializer
-from .models import Category,Product,Review
+from .serializers import UserSerializer,ProductSerializer,CategorySerializer, ReviewSerializer,OfferSerializer,AdSerializer,TagSerializer
+from .models import Category,Product,Review,Offer,Ad,Tag
 
 
 
@@ -167,3 +167,37 @@ class ReviewListCreateAPIView(generics.ListCreateAPIView):
 class ReviewDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+
+
+class OfferListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Offer.objects.all()
+    serializer_class = OfferSerializer
+
+class OfferDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Offer.objects.all()
+    serializer_class = OfferSerializer
+
+class AdListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Ad.objects.all()
+    serializer_class = AdSerializer
+    permission_classes = [IsAuthenticated]
+
+class AdRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Ad.objects.all()
+    serializer_class = AdSerializer
+    permission_classes = [IsAuthenticated]
+
+class TagListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+
+class TagRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+
+
+
+
+
+
+
