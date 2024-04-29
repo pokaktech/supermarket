@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-0)pty=96#w&o!eyl0%xepi=6c9a+_)xo8%3#&aibo5&)=&)04e
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -145,18 +145,17 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 
-FRONTEND_URL = 'http://your_frontend_url'
-EMAIL_HOST_USER = 'your_email@example.com'
+
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'aiswaryasurendran97@gmail.com'
-EMAIL_HOST_PASSWORD ='rrowytruczjnvaxv'
+EMAIL_HOST_USER = 'vssreejesh5@gmail.com'
+EMAIL_HOST_PASSWORD = 'tcobqbdpagfacgwb'
 EMAIL_PORT = 587
 
 
 import os
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR,'media/')
+

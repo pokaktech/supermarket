@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from .serializers import UserSerializer,ProductSerializer,CategorySerializer, ReviewSerializer,OfferSerializer,AdSerializer,TagSerializer
-from .models import Category,Product,Review,Offer,Ad,Tag
+from .serializers import UserSerializer,ProductSerializer,CategorySerializer, ReviewSerializer,OfferSerializer,AdSerializer,TagSerializer,CartSerializer,OrderItemSerializer,OrderSerializer
+from .models import Category,Product,Review,Offer,Ad,Tag,Order,OrderItem,Carts
 
 
-
+from rest_framework.decorators import action
 from rest_framework import generics
-from rest_framework import viewsets
+from rest_framework import viewsets,mixins
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -23,6 +23,7 @@ from django.conf import settings
 # from .serializers import PasswordResetSerializer
 from ecommerce.settings import FRONTEND_URL,EMAIL_HOST_USER
 from rest_framework.decorators import api_view
+
 
 class ListUsersAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -195,9 +196,104 @@ class TagRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
+# class CartListCreateAPIView(generics.ListCreateAPIView):
+#     queryset = Cart.objects.all()
+#     serializer_class = CartSerializer
+
+# class CartRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Cart.objects.all()
+#     serializer_class = CartSerializer
+
+# class CartItemCreateAPIView(generics.CreateAPIView):
+#     queryset = CartItem.objects.all()
+#     serializer_class = CartItemSerializer
+
+# class CartItemRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = CartItem.objects.all()
+#     serializer_class = CartItemSerializer
+
+
+class AddToCartView(APIView):
+    def post(self, request, product_id):
+        # Check if user is authenticated
+        if not request.user.is_authenticated:
+            return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        # Retrieve product instance based on product_id
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({'error': 'Product does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Extract quantity from request data
+        qty = request.data.get('qty')  # Assuming quantity is provided in the request data
+        user_obj=User.objects.get(id=request.user.id)
+        # Create or update cart item
+        cart_item_data = {
+
+            'qty': qty,  # Include quantity in the cart item data
+        }
+        cart_item_serializer = CartSerializer(data=cart_item_data)
+        if cart_item_serializer.is_valid():
+            cart_item_serializer.save(product=product,user=user_obj)
+            return Response(cart_item_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(cart_item_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
+class PlaceOrderView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        try:
+            # Extract data from request payload
+            product_data = request.data.get('product', [])
+            if not isinstance(product_data, list):
+                return Response({'error': 'Product data must be a list of dictionaries.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            date = request.data.get('date')
+            delivery_date = request.data.get('delivery_date')
+            delivery_time = request.data.get('delivery_time')
+            address = request.data.get('address')
+
+            # Create the order
+            order_data = {
+                'date': date,
+                'delivery_date': delivery_date,
+                'delivery_time': delivery_time,
+                'address': address,
+                'total_price': 0  # Initialize total_price to calculate later
+            }
+            order_serializer = OrderSerializer(data=order_data)
+            usr_obj= User.objects.get(id=request.user.id)
+            if order_serializer.is_valid():
+                order = order_serializer.save(user=usr_obj)
+                total_price = 0
+
+                # Create order items and calculate total price
+                for item in product_data:
+                    itm = Product.objects.get(id=item)
+                
+                    product_id = itm.get('id')
+                    qty = itm.quantity
+                    product = Product.objects.get(id=product_id)
+                    order_item = OrderItem.objects.create(order=order, product=product, qty=qty)
+                    total_price += product.price * qty
+
+                    cart_item = Carts.objects.filter(user=request.user, product=product)
+                    if cart_item:
+                        cart_item.delete()
 
 
+                # Update the total price of the order
+                order.total_price = total_price
+                order.save()
+
+                return Response(order_serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(order_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
