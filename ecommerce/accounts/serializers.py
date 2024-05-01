@@ -76,16 +76,19 @@ class AdSerializer(serializers.ModelSerializer):
         model = Ad
         fields = ['title','url','image','descripthon']
 
-class OrderSerializer(serializers.ModelSerializer):
-    user = serializers.CharField(read_only=True)
-
-    class Meta:
-        model = Order
-        fields = ['user','date','delivery_date','delivery_time','address','status']
-
-
 class OrderItemSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
 
     class Meta:
         model = OrderItem
-        fields = ['order','product','qty']
+        fields = ['id', 'order', 'product', 'qty']
+
+class OrderSerializer(serializers.ModelSerializer):
+    order_items = OrderItemSerializer(many=True, read_only=True)
+    total_price = serializers.ReadOnlyField() 
+    
+    class Meta:
+        model = Order
+        fields = ['id', 'date', 'delivery_date', 'delivery_time', 'address', 'total_price', 'order_items', 'status']
+
+   

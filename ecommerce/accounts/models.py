@@ -135,15 +135,15 @@ class Order(models.Model):
     ]
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     
-    @property
-    def total_price(self):
-        return sum(item.total_price for item in self.orderitem_set.all())
+    # @property
+    # def total_price(self):
+    #     return sum(item.total_price for item in self.orderitem_set.all())
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)     
     product = models.ForeignKey(Product, on_delete=models.CASCADE) 
     qty = models.PositiveIntegerField(default=1)
 
-    @property
-    def total_price(self):
-        return self.product.price * self.qty
+    # @property
+    # def total_price(self):
+    #     return self.product.price * self.qty

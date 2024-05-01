@@ -243,8 +243,8 @@ class AddToCartView(APIView):
 
 
 class PlaceOrderView(APIView):
-    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
 
     def post(self, request, *args, **kwargs):
         try:
@@ -263,37 +263,39 @@ class PlaceOrderView(APIView):
                 'date': date,
                 'delivery_date': delivery_date,
                 'delivery_time': delivery_time,
-                'address': address,
-                'total_price': 0  # Initialize total_price to calculate later
+                'address': address
             }
             order_serializer = OrderSerializer(data=order_data)
-            usr_obj= User.objects.get(id=request.user.id)
             if order_serializer.is_valid():
-                order = order_serializer.save(user=usr_obj)
+                order = order_serializer.save(user=request.user)
+
+                # Create order items
                 total_price = 0
-
-                # Create order items and calculate total price
                 for item in product_data:
-                    itm = Product.objects.get(id=item)
-                
-                    product_id = itm.get('id')
-                    qty = itm.quantity
-                    product = Product.objects.get(id=product_id)
-                    order_item = OrderItem.objects.create(order=order, product=product, qty=qty)
-                    total_price += product.price * qty
+                    if isinstance(item, dict) and 'id' in item and 'qty' in item:
+                        product_id = item.get('id')
+                        qty = item.get('qty')
+                        product = Product.objects.get(id=product_id)
+                        order_item = OrderItem.objects.create(order=order, product=product, qty=qty)
+                        total_price += product.price * qty
 
-                    cart_item = Carts.objects.filter(user=request.user, product=product)
-                    if cart_item:
-                        cart_item.delete()
-
+                        cart_item = Carts.objects.filter(user=request.user, product=product)
+                        if cart_item:
+                            cart_item.delete()
+                    else:
+                        return Response({'error': 'Invalid product data.'}, status=status.HTTP_400_BAD_REQUEST)
 
                 # Update the total price of the order
                 order.total_price = total_price
                 order.save()
 
+                # Refresh order serializer with updated instance
+                order_serializer = OrderSerializer(order)
+                
                 return Response(order_serializer.data, status=status.HTTP_201_CREATED)
             else:
                 return Response(order_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+                
