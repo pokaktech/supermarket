@@ -30,7 +30,7 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('accounts.urls')), 
+    path('accounts/', include('accounts.urls')),
     path('accounts/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('accounts/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # path('password-reset/',views.password_reset_view, name='password_reset'),
