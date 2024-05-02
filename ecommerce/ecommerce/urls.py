@@ -25,7 +25,6 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
     
-
 )
 
 urlpatterns = [
@@ -37,6 +36,7 @@ urlpatterns = [
     # path('set-password/<int:user_id>/',views.set_password_view, name='set_password'),
     path('password-reset/',views.password_reset_view, name='password_reset'),
     path('set-password/<int:user_id>/',views.set_password_view, name='set_password'),
+    
     
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
