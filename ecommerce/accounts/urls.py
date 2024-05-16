@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ListUsersAPIView,CreateUserAPIView,RetrieveUserAPIView,UpdateUserAPIView,CategoryListCreate, CategoryRetrieveUpdateDestroy,ProductListCreateAPIView, ProductDetailAPIView, ReviewListCreateAPIView, ReviewDetailAPIView,OfferDetailAPIView,OfferListCreateAPIView,AdListCreateAPIView,AdRetrieveUpdateDestroyAPIView,TagRetrieveUpdateDestroyAPIView,TagListCreateAPIView,AddToCartView,PlaceOrderView
+from .views import ListUsersAPIView,CreateUserAPIView,RetrieveUserAPIView,UpdateUserAPIView,CategoryListCreate, CategoryRetrieveUpdateDestroy,ProductListCreateAPIView, ProductDetailAPIView, ReviewListCreateAPIView, ReviewDetailAPIView,OfferDetailAPIView,OfferListCreateAPIView,AdListCreateAPIView,AdRetrieveUpdateDestroyAPIView,TagRetrieveUpdateDestroyAPIView,TagListCreateAPIView,AddToCartView,PlaceOrderView,create_payment_view,capture_payment_view,payment_callback
                   
 
 urlpatterns = [
@@ -29,6 +29,9 @@ urlpatterns = [
   # path('orders/<int:pk>/', OrderRetrieveUpdateDestroyView.as_view(), name='order-detail'),
   # path('order-items/', OrderItemListCreateView.as_view(), name='order-item-list-create'),
   # path('order-items/<int:pk>/', OrderItemRetrieveUpdateDestroyView.as_view(), name='order-item-detail'),
-  path ('place_order/',PlaceOrderView.as_view(),name='placeorder')
-  
+  path ('place_order/',PlaceOrderView.as_view(),name='placeorder'),
+  path('create_payment/', create_payment_view, name='create_payment'),
+  path('capture_payment/', capture_payment_view, name='capture_payment'),
+   path('payment_callback/', payment_callback, name='payment_callback'),
+  # path ('create_new_payment/',CreateNewPayment.as_view(),name='create_new_payment'),
 ]

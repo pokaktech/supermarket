@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from .serializers import UserSerializer,ProductSerializer,CategorySerializer, ReviewSerializer,OfferSerializer,AdSerializer,TagSerializer,CartSerializer,OrderItemSerializer,OrderSerializer
-from .models import Category,Product,Review,Offer,Ad,Tag,Order,OrderItem,Carts
-
+from .models import Category,Product,Review,Offer,Ad,Tag,Order,OrderItem,Carts,Payment
+from django.http import HttpResponse
 
 from rest_framework.decorators import action
 from rest_framework import generics
@@ -13,18 +13,113 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
-# from django.core.mail import send_mail
+# # from django.core.mail import send_mail
 # from django.conf import settings
 # from ecommerce.settings import FRONTEND_URL,EMAIL_HOST_USER
 # from rest_framework.decorators import api_view
-
+import logging
+from razorpay.errors import ServerError
 from django.core.mail import send_mail
 from django.conf import settings
 # from .serializers import PasswordResetSerializer
 from ecommerce.settings import FRONTEND_URL,EMAIL_HOST_USER
 from rest_framework.decorators import api_view
+import razorpay
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from . razorpay_integration import create_payment, capture_payment
+import json
+from rest_framework.authentication import TokenAuthentication
+from razorpay import client 
+logger = logging.getLogger(__name__)
+@csrf_exempt
+def create_payment_view(request):
+    if request.method == 'POST':
+        try:
+            # Parse JSON data from request body
+            data = json.loads(request.body.decode('utf-8'))
+            amount = data.get('amount')
+            receipt_id = data.get('receipt_id')
+
+ 
+
+            if not amount or not str(amount).isdigit():
+                return JsonResponse({'error': 'Invalid or missing amount'}, status=400)
+
+            amount = int(amount)  # Now safe to convert to int
+            payment_order = create_payment(amount=amount, receipt_id=receipt_id)
+            return JsonResponse(payment_order)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON format'}, status=400)
+
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 
+
+
+@csrf_exempt
+def capture_payment_view(request):
+    if request.method == 'POST':
+        try:
+            # Parse JSON data from request body
+            data = json.loads(request.body.decode('utf-8'))
+            amount = int(data.get('amount'))  # Assuming amount is required for capture
+            payment_id = data.get('payment_id')
+
+            print(amount, "amount")
+            print(payment_id, "payment_id")
+            # Perform payment capture logic
+            capture_result = capture_payment(payment_id=payment_id, amount=amount)
+
+            if capture_result:
+                return JsonResponse({'message': 'Payment captured successfully'})
+            else:
+                return JsonResponse({'error': 'Failed to capture payment'}, status=400)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON format'}, status=400)
+
+        except ServerError as e:
+            # Handle Razorpay ServerError
+            error_message = str(e)
+            # Log the actual exception for debugging
+            print(f"Razorpay ServerError:dd {error_message}")
+            print(error_message)
+            return JsonResponse({'error': 'Razorpay ServerError'}, status=500)
+
+        except Exception as e:
+            # Handle other exceptions
+            error_message = "An error occurred"
+            # Log the actual exception for debugging
+            print(e)
+            return JsonResponse({'error': error_message}, status=500)
+
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+@csrf_exempt
+def payment_callback(request):
+      if request.method == 'POST':
+        params_dict = request.POST
+        logger.info(f"Received POST data: {params_dict}")
+        
+        try:
+            razorpay_order_id = params_dict['razorpay_order_id']
+            razorpay_payment_id = params_dict['razorpay_payment_id']
+            payment_status = params_dict['razorpay_payment_status']
+
+            # Create Payment object
+            payment = Payment.objects.create(
+                razorpay_order_id=razorpay_order_id,
+                razorpay_payment_id=razorpay_payment_id,
+                status=payment_status
+            )
+
+            return HttpResponse(status=200)
+        except KeyError:
+            return HttpResponse('Invalid data. Missing required parameters.', status=400)
+        return HttpResponse(status=400)
+    
 class ListUsersAPIView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
@@ -297,5 +392,7 @@ class PlaceOrderView(APIView):
                 return Response(order_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 
                 

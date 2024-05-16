@@ -73,6 +73,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+PAYMENT_VARIANTS = {
+    'razorpay': ('django_payments_razorpay.RazorPayProvider', {
+        'public_key': 'rzp_test_IaGnSH1ZCoxcdg',
+        'secret_key': 'Ozb16vWTNAfMoXUnMhGnJJDy'})}
+
 ROOT_URLCONF = 'ecommerce.urls'
 
 TEMPLATES = [
@@ -159,3 +164,5 @@ import os
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media/')
 
+RAZORPAY_KEY_ID = 'rzp_test_IaGnSH1ZCoxcdg'
+RAZORPAY_KEY_SECRET = 'Ozb16vWTNAfMoXUnMhGnJJDy'
