@@ -24,14 +24,17 @@ from django.conf import settings
 # from .serializers import PasswordResetSerializer
 from ecommerce.settings import FRONTEND_URL,EMAIL_HOST_USER
 from rest_framework.decorators import api_view
+from django.http import HttpResponseBadRequest
 import razorpay
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from . razorpay_integration import create_payment, capture_payment
+from . razorpay_integration import create_payment
 import json
 from rest_framework.authentication import TokenAuthentication
 from razorpay import client 
 logger = logging.getLogger(__name__)
+client = razorpay.Client(auth=("rzp_test_IaGnSH1ZCoxcdg", "Ozb16vWTNAfMoXUnMhGnJJDy"))
+
 @csrf_exempt
 def create_payment_view(request):
     if request.method == 'POST':
@@ -56,70 +59,133 @@ def create_payment_view(request):
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 
-
-
 @csrf_exempt
-def capture_payment_view(request):
+def verify_payment_view(request):
     if request.method == 'POST':
         try:
-            # Parse JSON data from request body
             data = json.loads(request.body.decode('utf-8'))
-            amount = int(data.get('amount'))  # Assuming amount is required for capture
-            payment_id = data.get('payment_id')
+            razorpay_payment_id = data.get('razorpay_payment_id')
+            razorpay_order_id = data.get('razorpay_order_id')
+            razorpay_signature = data.get('razorpay_signature')
 
-            print(amount, "amount")
-            print(payment_id, "payment_id")
-            # Perform payment capture logic
-            capture_result = capture_payment(payment_id=payment_id, amount=amount)
+            params_dict = {
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_payment_id': razorpay_payment_id,
+                'razorpay_signature': razorpay_signature
+            }
 
-            if capture_result:
-                return JsonResponse({'message': 'Payment captured successfully'})
-            else:
-                return JsonResponse({'error': 'Failed to capture payment'}, status=400)
+            try:
+                client.utility.verify_payment_signature(params_dict)
+                # Payment signature is valid, process the order
+                return JsonResponse({'status': 'Payment successful'})
+            except razorpay.errors.SignatureVerificationError:
+                return JsonResponse({'status': 'Payment failed'}, status=400)
 
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON format'}, status=400)
 
-        except ServerError as e:
-            # Handle Razorpay ServerError
-            error_message = str(e)
-            # Log the actual exception for debugging
-            print(f"Razorpay ServerError:dd {error_message}")
-            print(error_message)
-            return JsonResponse({'error': 'Razorpay ServerError'}, status=500)
-
-        except Exception as e:
-            # Handle other exceptions
-            error_message = "An error occurred"
-            # Log the actual exception for debugging
-            print(e)
-            return JsonResponse({'error': error_message}, status=500)
-
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
+# @csrf_exempt
+# def capture_payment_view(request):
+#     if request.method == 'POST':
+#         try:
+#             # Parse JSON data from request body
+#             data = json.loads(request.body.decode('utf-8'))
+#             amount = int(data.get('amount'))  # Assuming amount is required for capture
+#             payment_id = data.get('payment_id')
+
+#             print(amount, "amount")
+#             print(payment_id, "payment_id")
+#             # Perform payment capture logic
+#             capture_result = capture_payment(payment_id=payment_id, amount=amount)
+
+#             if capture_result:
+#                 return JsonResponse({'message': 'Payment captured successfully'})
+#             else:
+#                 return JsonResponse({'error': 'Failed to capture payment'}, status=400)
+
+#         except json.JSONDecodeError:
+#             return JsonResponse({'error': 'Invalid JSON format'}, status=400)
+
+#         except ServerError as e:
+#             # Handle Razorpay ServerError
+#             error_message = str(e)
+#             # Log the actual exception for debugging
+#             print(f"Razorpay ServerError:dd {error_message}")
+#             print(error_message)
+#             return JsonResponse({'error': 'Razorpay ServerError'}, status=500)
+
+#         except Exception as e:
+#             # Handle other exceptions
+#             error_message = "An error occurred"
+#             # Log the actual exception for debugging
+#             print(e)
+#             return JsonResponse({'error': error_message}, status=500)
+
+#     return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+# @csrf_exempt
+# def payment_success(request):
+#     if request.method == "POST":
+#         payment_data = request.POST
+#         try:
+#             razorpay_order_id = payment_data['razorpay_order_id']
+#             razorpay_payment_id = payment_data['razorpay_payment_id']
+#             razorpay_signature = payment_data['razorpay_signature']
+
+#             # Verify the payment signature
+#             params_dict = {
+#                 'razorpay_order_id': razorpay_order_id,
+#                 'razorpay_payment_id': razorpay_payment_id,
+#                 'razorpay_signature': razorpay_signature
+#             }
+
+#             result = client.utility.verify_payment_signature(params_dict)
+
+#             if result is None:
+#                 # Signature is valid
+#                 order = Order.objects.get(order_id=razorpay_order_id)
+#                 order.razorpay_payment_id = razorpay_payment_id
+#                 order.status = 'PAID'
+#                 order.save()
+#                 return render(request, 'payment_success.html', {'order': order})
+#             else:
+#                 # Signature verification failed
+#                 return HttpResponseBadRequest('Invalid payment signature')
+#         except Exception as e:
+#             return HttpResponseBadRequest(f'Error: {str(e)}')
+#     return HttpResponseBadRequest('Invalid request method')
+def payment_view(request):
+    return render(request, 'payment.html')
+def payment_success(request):
+    # Create a mock order for testing
+    mock_order = Order(
+        order_id='order_OCm1R91JnVRiUX',
+        amount=10000,
+        amount_paid=1000,
+        amount_due=0,
+        currency='INR',
+        status='PAID',
+        razorpay_payment_id='test_payment_id'
+    )
+    return render(request, 'payment_success.html', {'order': mock_order})
+
 @csrf_exempt
-def payment_callback(request):
-      if request.method == 'POST':
-        params_dict = request.POST
-        logger.info(f"Received POST data: {params_dict}")
-        
+def payment_failure(request):
+    if request.method == "POST":
+        payment_data = request.POST
         try:
-            razorpay_order_id = params_dict['razorpay_order_id']
-            razorpay_payment_id = params_dict['razorpay_payment_id']
-            payment_status = params_dict['razorpay_payment_status']
+            razorpay_order_id = payment_data['razorpay_order_id']
+            order = Order.objects.get(order_id=razorpay_order_id)
+            order.status = 'FAILED'
+            order.save()
+            return render(request, 'payment_failure.html', {'order': order})
+        except Exception as e:
+            return HttpResponseBadRequest(f'Error: {str(e)}')
+    return HttpResponseBadRequest('Invalid request method')
 
-            # Create Payment object
-            payment = Payment.objects.create(
-                razorpay_order_id=razorpay_order_id,
-                razorpay_payment_id=razorpay_payment_id,
-                status=payment_status
-            )
-
-            return HttpResponse(status=200)
-        except KeyError:
-            return HttpResponse('Invalid data. Missing required parameters.', status=400)
-        return HttpResponse(status=400)
-    
 class ListUsersAPIView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]

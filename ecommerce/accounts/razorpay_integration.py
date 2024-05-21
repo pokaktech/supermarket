@@ -8,7 +8,7 @@ client = razorpay.Client(auth=("rzp_test_IaGnSH1ZCoxcdg", "Ozb16vWTNAfMoXUnMhGnJ
 def create_payment(amount, currency='INR', receipt_id=None):
     # Create payment order
     data = {
-        'amount': amount,               
+        'amount': amount * 100,               
         'currency': currency,
         'receipt': receipt_id,
         'payment_capture': '1'         
@@ -16,8 +16,5 @@ def create_payment(amount, currency='INR', receipt_id=None):
     payment_order = client.order.create(data=data)
     return payment_order
 
-def capture_payment(payment_id, amount):
-    # Capture payment
-    client.payment.capture(payment_id=payment_id, amount=amount)
-    
-    return True
+
+

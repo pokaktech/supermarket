@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ListUsersAPIView,CreateUserAPIView,RetrieveUserAPIView,UpdateUserAPIView,CategoryListCreate, CategoryRetrieveUpdateDestroy,ProductListCreateAPIView, ProductDetailAPIView, ReviewListCreateAPIView, ReviewDetailAPIView,OfferDetailAPIView,OfferListCreateAPIView,AdListCreateAPIView,AdRetrieveUpdateDestroyAPIView,TagRetrieveUpdateDestroyAPIView,TagListCreateAPIView,AddToCartView,PlaceOrderView,create_payment_view,capture_payment_view,payment_callback
+from .views import ListUsersAPIView,CreateUserAPIView,RetrieveUserAPIView,UpdateUserAPIView,CategoryListCreate, CategoryRetrieveUpdateDestroy,ProductListCreateAPIView, ProductDetailAPIView, ReviewListCreateAPIView, ReviewDetailAPIView,OfferDetailAPIView,OfferListCreateAPIView,AdListCreateAPIView,AdRetrieveUpdateDestroyAPIView,TagRetrieveUpdateDestroyAPIView,TagListCreateAPIView,AddToCartView,PlaceOrderView,create_payment_view,verify_payment_view,payment_success,payment_failure,payment_view
                   
 
 urlpatterns = [
@@ -31,7 +31,10 @@ urlpatterns = [
   # path('order-items/<int:pk>/', OrderItemRetrieveUpdateDestroyView.as_view(), name='order-item-detail'),
   path ('place_order/',PlaceOrderView.as_view(),name='placeorder'),
   path('create_payment/', create_payment_view, name='create_payment'),
-  path('capture_payment/', capture_payment_view, name='capture_payment'),
-   path('payment_callback/', payment_callback, name='payment_callback'),
+  # path('payment_callback/', payment_callback, name='payment_callback'),
+  path('payment/', payment_view, name='payment'),
+  path('verify-payment/', verify_payment_view, name='verify_payment'),
+  path('payment/success/', payment_success, name='payment_success'),
+  path('payment/failure/', payment_failure, name='payment_failure'), 
   # path ('create_new_payment/',CreateNewPayment.as_view(),name='create_new_payment'),
 ]

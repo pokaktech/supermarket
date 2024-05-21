@@ -155,4 +155,5 @@ class Payment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Payment {self.id}: {self.status}"
+        return f"Payment {self.razorpay_order_id}: {self.status}"
+

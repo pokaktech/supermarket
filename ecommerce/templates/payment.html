@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Razorpay Payment</title>
+</head>
+<body>
+    <form id="payment-form">
+        <label for="amount">Amount (INR):</label>
+        <input type="number" id="amount" name="amount" min="1" required>
+        <button type="button" onclick="startPayment()">Pay with Razorpay</button>
+    </form>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        function startPayment() {
+            const amountInput = document.getElementById('amount').value;
+            const amount = parseInt(amountInput); // Convert to paise
+
+            fetch('/accounts/create_payment/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    amount: amount, // example amount
+                    receipt_id: 'order_rcptid_4' // example receipt ID
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    return;
+                }
+                print("1",data.amount)
+                var options = {
+                    "key": "rzp_test_IaGnSH1ZCoxcdg", // Replace with your Razorpay Key ID
+                    "amount": data.amount,
+                    "currency": "INR",
+                    "name": "Company Name",
+                    "description": "Test Transaction",
+                    "image": "https://your_logo_url",
+                    "order_id": data.id, // This is the order ID generated in Step 1
+                    "handler": function (response) {
+                        // After payment is successful
+                        // alert('Payment successful! ID: ' + response.razorpay_payment_id);
+                        // Optionally, send this response to your server for verification
+                        fetch('/accounts/verify-payment/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature
+                            }),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'Payment successful') {
+                                alert('Payment successful!');
+                            } else {
+                                alert('Payment verification failed: ' + data.status);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                    },
+                    "prefill": {
+                        "name": "Test User",
+                        "email": "test.user@example.com",
+                        "contact": "9999999999"
+                    },
+                    "theme": {
+                        "color": "#F37254"
+                    }
+                };
+                print("2",data.amount)
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
+
+
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>Razorpay Payment</title>
+</head>
+<body>
+    <form action="https://api.razorpay.com/v1/checkout/embedded" method="POST">
+        <script src="https://checkout.razorpay.com/v1/checkout.js"
+                data-key="rzp_test_IaGnSH1ZCoxcdg" // Replace with your Razorpay Key ID
+                data-amount="1000" // Amount is in currency subunits. Here it is 1000 paise or INR 10.00
+                data-currency="INR"
+                data-order_id="order_OCMl9lidbF73ra" // Pass the order ID
+                data-buttontext="Pay with Razorpay"
+                data-name="Your Company Name"
+                data-description="Test Transaction"
+                data-image="https://your_logo_url"
+                data-prefill.name="Test User"
+                data-prefill.email="test.user@example.com"
+                data-prefill.contact="9999999999"
+                data-theme.color="#F37254">
+        </script>
+        <input type="hidden" value="Hidden Element" name="hidden">
+    </form>
+</body>
+</html> -->
