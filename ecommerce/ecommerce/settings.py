@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
-    'accounts'
+    'custom_admin',
+    'accounts',
+    'corsheaders'
 ]
 
 
@@ -57,8 +59,8 @@ REST_FRAMEWORK = {
 # Simple JWT settings
 from datetime import timedelta
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=100),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=100),
 
 }
 
@@ -146,6 +148,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+LOGIN_REDIRECT_URL = 'dashboard'  
 # STATICFILES_DIRS = [
 #     BASE_DIR / "accounts/migrations/static",
 # ]

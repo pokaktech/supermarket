@@ -63,6 +63,8 @@ class Product(models.Model):
     image = models.ImageField(upload_to='product_images/', null=True, blank=True)
     quantity = models.IntegerField()
     quantity_in_stock = models.PositiveIntegerField(default=0)
+    stock = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
     tags = models.ManyToManyField(Tag, blank=True)
     related_products = models.ManyToManyField('self', blank=True)
     offers = models.ManyToManyField(Offer)

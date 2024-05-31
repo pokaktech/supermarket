@@ -86,77 +86,7 @@ def verify_payment_view(request):
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-# @csrf_exempt
-# def capture_payment_view(request):
-#     if request.method == 'POST':
-#         try:
-#             # Parse JSON data from request body
-#             data = json.loads(request.body.decode('utf-8'))
-#             amount = int(data.get('amount'))  # Assuming amount is required for capture
-#             payment_id = data.get('payment_id')
 
-#             print(amount, "amount")
-#             print(payment_id, "payment_id")
-#             # Perform payment capture logic
-#             capture_result = capture_payment(payment_id=payment_id, amount=amount)
-
-#             if capture_result:
-#                 return JsonResponse({'message': 'Payment captured successfully'})
-#             else:
-#                 return JsonResponse({'error': 'Failed to capture payment'}, status=400)
-
-#         except json.JSONDecodeError:
-#             return JsonResponse({'error': 'Invalid JSON format'}, status=400)
-
-#         except ServerError as e:
-#             # Handle Razorpay ServerError
-#             error_message = str(e)
-#             # Log the actual exception for debugging
-#             print(f"Razorpay ServerError:dd {error_message}")
-#             print(error_message)
-#             return JsonResponse({'error': 'Razorpay ServerError'}, status=500)
-
-#         except Exception as e:
-#             # Handle other exceptions
-#             error_message = "An error occurred"
-#             # Log the actual exception for debugging
-#             print(e)
-#             return JsonResponse({'error': error_message}, status=500)
-
-#     return JsonResponse({'error': 'Method not allowed'}, status=405)
-
-
-# @csrf_exempt
-# def payment_success(request):
-#     if request.method == "POST":
-#         payment_data = request.POST
-#         try:
-#             razorpay_order_id = payment_data['razorpay_order_id']
-#             razorpay_payment_id = payment_data['razorpay_payment_id']
-#             razorpay_signature = payment_data['razorpay_signature']
-
-#             # Verify the payment signature
-#             params_dict = {
-#                 'razorpay_order_id': razorpay_order_id,
-#                 'razorpay_payment_id': razorpay_payment_id,
-#                 'razorpay_signature': razorpay_signature
-#             }
-
-#             result = client.utility.verify_payment_signature(params_dict)
-
-#             if result is None:
-#                 # Signature is valid
-#                 order = Order.objects.get(order_id=razorpay_order_id)
-#                 order.razorpay_payment_id = razorpay_payment_id
-#                 order.status = 'PAID'
-#                 order.save()
-#                 return render(request, 'payment_success.html', {'order': order})
-#             else:
-#                 # Signature verification failed
-#                 return HttpResponseBadRequest('Invalid payment signature')
-#         except Exception as e:
-#             return HttpResponseBadRequest(f'Error: {str(e)}')
-#     return HttpResponseBadRequest('Invalid request method')
 def payment_view(request):
     return render(request, 'payment.html')
 def payment_success(request):
