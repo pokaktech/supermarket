@@ -1,0 +1,115 @@
+/* Ads Container */
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.carousel-indicators li {
+  width: 10px;
+  height: 10px;
+  background-color: #000; /* Change the color as needed */
+  border-radius: 50%;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.carousel-indicators .active {
+  background-color: #fff; /* Change the active color as needed */
+}
+
+.ads-container {
+  width: 100%; /* Adjust the width of the ads container to fill the entire width */
+  overflow: hidden; /* Hide overflow content */
+  position: relative;
+  height:220px;
+  background-color: #f4f4f4; /* Light grey background color */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+.modal-container {
+  display: flex;
+  flex-direction: column; /* Align items vertically */
+  align-items: center; /* Center items horizontally */
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.modal-container > * {
+  margin-bottom: 10px; /* Add some vertical space between items */
+}
+ 
+.modal-image {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+/* Ad Item */
+.ad-item {
+  position: relative;
+  width: 100%;
+  transition: transform 0.3s ease-in-out; /* Smooth zoom effect */
+}
+
+/* Ad Image */
+.ad-image {
+  width: 100%; /* Ensure the ad images fill the container */
+  height: 220px; /* Maintain aspect ratio */
+  border-radius: 10px; /* Rounded corners */
+}
+
+/* Ad Overlay */
+.ad-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black overlay */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  text-align: center;
+}
+
+/* Ad Overlay Content */
+.ad-overlay-content {
+  max-width: 80%; /* Limit the width of the overlay content */
+}
+
+/* Ad Title */
+.ad-title {
+  color: black;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Ad Description */
+.ad-description {
+  color: black;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Media Query for Small Screens */
+@media screen and (max-width: 768px) {
+  .ad-title {
+    font-size: 20px; /* Adjust font size for small screens */
+  }
+  .ad-description {
+    font-size: 14px; /* Adjust font size for small screens */
+  }
+}

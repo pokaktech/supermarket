@@ -1,0 +1,172 @@
+/* General container styling */
+body {
+  background-color: #f0f2f5; /* Light neutral background */
+  color: #333; /* Dark text for readability */
+  font-family: 'Arial', sans-serif;
+  transition: background-color 0.5s; /* Add a smooth transition for background color changes */
+}
+
+.containers {
+  padding: 20px;
+  max-width: 1200px; /* Add a maximum width for a more responsive design */
+  margin: 40px auto; /* Add some margin for better spacing */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle shadow to the container */
+  border-radius: 10px; /* Add rounded corners to the container */
+  overflow: hidden; /* Ensure content stays within rounded corners */
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+
+}
+
+.category-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px; /* Gap between cards */
+  animation: slide-in 0.5s ease-in-out; /* Add a slide-in animation */
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Card styling */
+.category-card {
+  transition: transform 0.2s, box-shadow 0.2s; /* Add a smooth transition for card animations */
+  width: 250px; /* Fixed width for uniform size */
+  height: 350px; /* Fixed height for uniform size */
+  background-color: #fff; /* White background for cards */
+  border-radius: 10px; /* Rounded corners */
+  overflow: hidden; /* Ensure content stays within rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  cursor: pointer; /* Add a pointer cursor for hover effect */
+  position: relative; /* Add position relative for the overlay effect */
+}
+
+.category-card:hover {
+  transform: translateY(-10px) scale(1.02); /* Add a slight scale effect on hover */
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* More pronounced shadow on hover */
+}
+
+.image-wrapper {
+  height: 200px;
+  width: 100%;
+  object-fit: cover;
+  border-bottom: 1px solid #ddd; /* Separate image from content */
+  transition: transform 0.2s; /* Add a smooth transition for image animations */
+}
+
+.image-wrapper:hover {
+  transform: scale(1.05); /* Add a slight scale effect on hover */
+}
+
+.card-overlay {
+  position: absolute; /* Add position absolute for the overlay effect */
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.2); /* Add a semi-transparent overlay */
+  border-bottom-left-radius: 10px; /* Add rounded corners to the overlay */
+  border-bottom-right-radius: 10px; /* Add rounded corners to the overlay */
+  overflow: hidden; /* Ensure content stays within rounded corners */
+  width: 100%;
+  height: 0; /* Set the height to 0 initially */
+  transition: height 0.3s ease-in-out; /* Add a smooth transition for the overlay height */
+}
+
+.category-card:hover .card-overlay {
+  height: 60px; /* Set the height to 60px on hover */
+}
+
+.card-body {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content:space-between;
+  height: calc(100% - 200px);
+}
+
+.card-title {
+  font-size: 1.2em;
+  margin-bottom: 10px;
+  color: #333; /* Darker text for title */
+  transition: color 0.2s; /* Add a smooth transition for title color changes */
+}
+
+.card-title:hover {
+  color: #007bff; /* Change title color on hover */
+}
+
+.card-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+button {
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+button:hover {
+  background-color: #007bff;
+  color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add a subtle shadow on hover */
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Modal styling */
+.modal-header, .modal-footer {
+  background-color: #f0f2f5; /* Match modal background to page */
+  border: none; /* Remove default borders */
+  padding: 20px; /* Add some padding for better spacing */
+  border-radius: 10px 10px 0 0; /* Add rounded corners to the modal header */
+}
+
+.modal-title {
+  color: #333; /* Match title color to page */
+  font-size: 1.5em; /* Increase font size for better readability */
+}
+
+.form-label {
+  color: #555; /* Slightly lighter text for labels */
+  margin-bottom: 10px; /* Add some margin for better spacing */
+}
+
+.form-control {
+  border-radius: 5px; /* Rounded input fields */
+  border: 1px solid #ddd; /* Light border for input fields */
+  padding: 10px; /* Add some padding for better spacing */
+  transition: border-color 0.2s; /* Add a smooth transition for input field border color changes */
+}
+
+.form-control:focus {
+  border-color: #007bff; /* Change border color on focus */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add a subtle shadow on focus */
+}
+
+/* Add a subtle animation for the form input fields */
+.form-control:not(:focus):not(:placeholder-shown) {
+  animation: fade-in 0.3s ease-in-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
