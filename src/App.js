@@ -1,61 +1,38 @@
 
-// App.js
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './components/Home';
-import Cart from './components/Cart';
-import Orders from './components/Orders';
-import Categories from './components/Categories';
-import CustomNavbar from './components/Navbar';
-import Products from './components/Products';
-import Signup from './components/Signup';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/Login';
+import Advertisements from './components/Advertisements';
+import AdminDashboard from './components/AdminDashboard';
+import CategoryList from './components/CategoryList';
+import ProductList from './components/ProductList';
+import NavBar from './components/Navbar';
+import SpecialOffersList from './components/SpecialOffersList';
+import UserActivity from "./components/UserActivity";
+import TagList from "./components/TagsList";
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import '@coreui/coreui/dist/css/coreui.min.css'
 
-import ForgotPassword from "./components/ForgotPassword";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Product from './components/Product';
-import { CartProvider } from './components/ContextReducer'; // Import the CartProvider
-import { CssBaseline } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-
-const theme = createTheme();
-
+import 'bootstrap/dist/css/bootstrap.min.css'
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    // Check if the user is logged in by checking the presence of a token in localStorage
-    const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token); // Set isLoggedIn based on whether token exists
-  }, []);
-
   return (
     <Router>
-      <CartProvider>
-      <ThemeProvider theme={theme}>
-      <CssBaseline />
-        <div className="App">
-          <CustomNavbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+       <NavBar/>
+      <div className="App">
+       
+        <Routes>
+          <Route path="/admin-login" element={<Login />} />
         
-        
-    
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-           
-            {!isLoggedIn && (
-              <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
-            )}
-            <Route path="/products/:categoryTitle" element={<Product />} />
-          </Routes>
-        </div>
-        </ThemeProvider>
-      </CartProvider>
+          <Route path="/" element={<AdminDashboard />} />
+          <Route path="/ads" element={<Advertisements />} />
+          <Route path="/category-list" element={<CategoryList />} />
+          <Route path="/tags" element={<TagList />} />
+          <Route path="/product-list" element={<ProductList />} />
+          <Route path="/special-offers-list" element={<SpecialOffersList />} />
+          <Route path="/user-activity" element={<UserActivity />} />
+          {/* Add more routes as needed */}
+        </Routes>
+      </div>
     </Router>
   );
 }
